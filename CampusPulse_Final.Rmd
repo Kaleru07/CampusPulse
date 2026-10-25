@@ -1,0 +1,93 @@
+---
+title: "CampusPulse — Student Engagement & Dropout Risk Analytics"
+author: "Kaleru Sriniketh | 160124771041"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+# Introduction and problem statement
+
+CampusPulse is a student-outcome analytics case study using the UCI *Predict Students' Dropout and Academic Success* dataset. The target categories are Dropout, Enrolled and Graduate. The project compares two classification algorithms under two feature-availability scenarios and uses feature importance and LIME to interpret model behaviour. It is a decision-support exercise, not a definitive judgement about an individual student.
+
+# Dataset and preparation
+
+The UCI dataset contains 4,424 records, 36 predictors and one target column. The original CSV is comma-separated. The analysis uses the UCI source URL directly and standardises column names with `janitor::clean_names()`. The cleaned dataset used in the completed analysis had no missing values.
+
+# Exploratory analysis
+
+Recorded target distribution:
+
+| Outcome | Students | Percentage |
+|---|---:|---:|
+| Dropout | 1,421 | 32.12% |
+| Enrolled | 794 | 17.95% |
+| Graduate | 2,209 | 49.91% |
+
+Recorded group averages:
+
+| Outcome | Average age at enrolment | Admission grade | First-semester grade |
+|---|---:|---:|---:|
+| Dropout | 26.1 | 125.0 | 7.26 |
+| Enrolled | 22.4 | 126.0 | 11.1 |
+| Graduate | 21.8 | 129.0 | 12.6 |
+
+These are descriptive associations, not causal findings.
+
+# Prediction scenarios and models
+
+- **Scenario A:** admission-time/background information; first- and second-semester features excluded.
+- **Scenario B:** Scenario A plus first-semester academic information; second-semester features excluded.
+
+The algorithms are Multinomial Logistic Regression and Random Forest. Performance is evaluated using accuracy, macro precision, macro recall, macro F1 and confusion matrices.
+
+# Recorded results
+
+| Scenario | Model | Accuracy | Macro precision | Macro recall | Macro F1 |
+|---|---|---:|---:|---:|---:|
+| A | Multinomial Logistic Regression | 64.21% | 56.08% | 53.59% | 53.25% |
+| A | Random Forest | 65.80% | 59.25% | 54.24% | 52.95% |
+| B | Multinomial Logistic Regression | 73.61% | 65.52% | 63.92% | 63.84% |
+| B | Random Forest | 74.97% | 68.72% | 64.13% | 63.90% |
+
+Scenario B Random Forest had the highest recorded accuracy (74.97%) and macro F1 (63.90%). Adding first-semester data increased accuracy by 9.17 percentage points for Random Forest and 9.40 percentage points for Logistic Regression.
+
+## Class-wise evaluation
+
+Scenario B Random Forest confusion matrix (rows = predicted; columns = actual):
+
+| Predicted / Actual | Dropout | Enrolled | Graduate |
+|---|---:|---:|---:|
+| Dropout | 227 | 52 | 27 |
+| Enrolled | 16 | 34 | 13 |
+| Graduate | 41 | 72 | 401 |
+
+Class recall: Dropout 79.93%, Enrolled 21.52%, Graduate 90.93%. The low Enrolled recall is a major limitation and shows why overall accuracy alone is insufficient.
+
+## Feature importance and LIME
+
+Recorded top Scenario B Random Forest features:
+
+| Feature | Importance |
+|---|---:|
+| First-semester approved curricular units | 337.54 |
+| First-semester grade | 219.15 |
+| Course | 162.96 |
+| Father's occupation | 130.39 |
+| Tuition fees up to date | 111.06 |
+
+LIME was applied to one selected Scenario B Random Forest prediction. The model predicted Dropout with a score of approximately 86.16%. The strongest positive local contributions included tuition-fee status (+0.2567) and approved first-semester curricular units (+0.2055). This explanation is local to one selected case and is not causal.
+
+# Conclusion, limitations and future work
+
+CampusPulse demonstrates a complete workflow for student-outcome classification using R. Scenario B Random Forest achieved the strongest recorded overall metrics. However, its Enrolled-class recall was only 21.52%, so the model requires improvement before any operational use. The dataset may not represent every institution; feature importance and LIME do not establish causation; and predictions should support human review rather than automate high-impact decisions.
+
+Future work includes improving Enrolled-class recognition, using repeated cross-validation and external validation, and evaluating probability calibration with domain experts.
+
+# References
+
+1. UCI Machine Learning Repository. *Predict Students' Dropout and Academic Success*. https://doi.org/10.24432/C5MC89
+2. Kuhn, M. (2008). Building Predictive Models in R Using the caret Package. *Journal of Statistical Software*, 28(5).
+3. Ribeiro, M. T., Singh, S., and Guestrin, C. (2016). “Why Should I Trust You?” Explaining the Predictions of Any Classifier. *Proceedings of KDD*.
