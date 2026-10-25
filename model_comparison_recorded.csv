@@ -1,0 +1,5 @@
+Scenario,Model,Accuracy,Macro_Precision,Macro_Recall,Macro_F1
+Scenario A,Multinomial Logistic Regression,0.6421,0.5608,0.5359,0.5325
+Scenario A,Random Forest,0.6580,0.5925,0.5424,0.5295
+Scenario B,Multinomial Logistic Regression,0.7361,0.6552,0.6392,0.6384
+Scenario B,Random Forest,0.7497,0.6872,0.6413,0.6390
